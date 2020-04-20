@@ -31,10 +31,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        btn = findViewById(R.id.btn);
-        tv1 = findViewById(R.id.tv1);
-        tv2 = findViewById(R.id.tv2);
-        tv_result = findViewById(R.id.tv_result);
+        btn = findViewById(R.id.btn); // 누르면 시작
+        tv1 = findViewById(R.id.tv1); // 예시 문장
+        tv2 = findViewById(R.id.tv2); // 인식된 문장
+        tv_result = findViewById(R.id.tv_result); // 저장된 문장
         speech = findViewById(R.id.speech);
 
         if (Build.VERSION.SDK_INT >= 23) {
@@ -53,11 +53,14 @@ public class MainActivity extends AppCompatActivity {
             btn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    count++;
-                    tv1.setText(example[count]);
-                    mRecognizer = SpeechRecognizer.createSpeechRecognizer(getApplicationContext());
-                    mRecognizer.setRecognitionListener(listener);
-                    mRecognizer.startListening(i);
+                    if(count<4) {
+                        count++;
+                    }
+                        tv1.setText(example[count]);
+                        mRecognizer = SpeechRecognizer.createSpeechRecognizer(getApplicationContext());
+                        mRecognizer.setRecognitionListener(listener);
+                        mRecognizer.startListening(i);
+
                 }
             });
 
@@ -68,12 +71,14 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onReadyForSpeech(Bundle params) {
             System.out.println("onReadyForSpeech.........................");
+            speech.setTextColor(Color.parseColor("#FFA7D5FF"));
+            Toast.makeText(getApplicationContext(), "지금 말해주세요.", Toast.LENGTH_SHORT).show();
+
         }
 
         @Override
         public void onBeginningOfSpeech() {
-            speech.setTextColor(Color.parseColor("#FFA7D5FF"));
-            Toast.makeText(getApplicationContext(), "지금 말해주세요.", Toast.LENGTH_SHORT).show();
+
         }
 
         @Override
