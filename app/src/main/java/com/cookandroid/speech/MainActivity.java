@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
     int count, rightCount;
     String recText;
     String lyrics;
-    int[] wrong = new int[10];
+    int[] wrong = new int[20];
     int wrong_num;
 
 
@@ -162,21 +162,23 @@ public class MainActivity extends AppCompatActivity {
             int length = (recText.length()>lyrics.length())?recText.length():lyrics.length();
             for (int i = 0; i < length; i++) {
                 try {
-                    if ((recText.charAt(i)) == (lyrics.charAt(i))) {  //음성정보와 가사와 비교해서 가사 정확도 점수측정
-                        rightCount++;
+                    if ((recText.charAt(i)) == (lyrics.charAt(i))) {  //음성정보와 가사와 비교
+                        rightCount++; // 맞은 개수 체크
                     } else {
-                        wrong[wrong_num] = i;
+                        wrong[wrong_num] = i; // 틀린 부분 저장
                         wrong_num++;
                     }
                 } catch (Exception e) {
-                    break;
+                    wrong[wrong_num] = i; // 틀린 부분 저장
+                    wrong_num++;
                 }
             }
 
             for(int j=0; j<wrong_num; j++) {
                 for(int i=0; i<recText_org.length(); i++) {
                     try {
-                        if((recText_org.charAt(i)) == (recText.charAt(wrong[j]))) {
+                        if((recText_org.charAt(i)) == (recText.charAt(wrong[j]))) { // 기존 예시에서 틀린 부분 찾기
+                            // 틀린 부분 색깔 바꾸기
                             ForegroundColorSpan span = new ForegroundColorSpan(Color.parseColor("#FFFA5252"));
                             sb.setSpan(span, i, i+1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                         }
@@ -187,14 +189,16 @@ public class MainActivity extends AppCompatActivity {
 
             }
 
-            if(rightCount > recText.length()-3) {
+            if(rightCount >= recText.length()-3) { // 맞은 개수 확인
                 tv2.setText(sb);
                 btn.setEnabled(true);
 
-            } else {
+            } else { // 제대로 말할 때까지 반복
+                tv2.setText(sb);
                 btn.setEnabled(false);
                 Toast.makeText(getApplicationContext(), "다시 말해주세요.", Toast.LENGTH_SHORT).show();
                 rightCount=0;
+                wrong_num=0;
                 mRecognizer.startListening(i);
             }
 
