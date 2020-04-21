@@ -10,8 +10,14 @@ import android.speech.SpeechRecognizer;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,11 +27,15 @@ public class MainActivity extends AppCompatActivity {
     Intent i;
     SpeechRecognizer mRecognizer;
     Button btn;
-    TextView tv1, tv2, speech, tv_result;
+    TextView tv1, tv2, speech;
     int PERMISSION;
-    String[] result = new String[5];
     String[] example = new String[5];
-    int count;
+    int count, rightCount;
+    String recText;
+    String lyrics;
+    int[] wrong = new int[10];
+    int wrong_num;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +44,6 @@ public class MainActivity extends AppCompatActivity {
         btn = findViewById(R.id.btn); // 누르면 시작
         tv1 = findViewById(R.id.tv1); // 예시 문장
         tv2 = findViewById(R.id.tv2); // 인식된 문장
-        tv_result = findViewById(R.id.tv_result); // 저장된 문장
         speech = findViewById(R.id.speech);
 
         if (Build.VERSION.SDK_INT >= 23) {
@@ -53,6 +62,8 @@ public class MainActivity extends AppCompatActivity {
             btn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    wrong_num=0;
+                    rightCount=0;
                     if(count<4) {
                         count++;
                     }
@@ -61,19 +72,17 @@ public class MainActivity extends AppCompatActivity {
                         mRecognizer.setRecognitionListener(listener);
                         mRecognizer.startListening(i);
 
+
                 }
             });
 
     }
 
-    RecognitionListener listener = new RecognitionListener() {
-
+    private final RecognitionListener listener = new RecognitionListener() {
         @Override
         public void onReadyForSpeech(Bundle params) {
-            System.out.println("onReadyForSpeech.........................");
-            speech.setTextColor(Color.parseColor("#FFA7D5FF"));
-            Toast.makeText(getApplicationContext(), "지금 말해주세요.", Toast.LENGTH_SHORT).show();
 
+            Toast.makeText(getApplicationContext(), "음성인식을 시작합니다.", Toast.LENGTH_SHORT).show();
         }
 
         @Override
@@ -83,18 +92,15 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onRmsChanged(float rmsdB) {
-            System.out.println("onRmsChanged.........................");
+
         }
 
         @Override
         public void onBufferReceived(byte[] buffer) {
-            System.out.println("onBufferReceived.........................");
         }
 
         @Override
         public void onEndOfSpeech() {
-            System.out.println("onEndOfSpeech.........................");
-            speech.setTextColor(Color.parseColor("#000000"));
 
         }
 
@@ -135,31 +141,73 @@ public class MainActivity extends AppCompatActivity {
                     break;
             }
 
-            Toast.makeText(getApplicationContext(), "에러가 발생하였습니다. : " + message,Toast.LENGTH_SHORT).show();
-        }
-
-        @Override
-        public void onPartialResults(Bundle partialResults) {
-            System.out.println("onPartialResults.........................");
-        }
-
-        @Override
-        public void onEvent(int eventType, Bundle params) {
-            System.out.println("onEvent.........................");
+            Toast.makeText(getApplicationContext(), "에러가 발생하였습니다. : " + message, Toast.LENGTH_SHORT).show();
         }
 
         @Override
         public void onResults(Bundle results) {
-            String key = "";
-            key = SpeechRecognizer.RESULTS_RECOGNITION;
-            ArrayList<String> mResult = results.getStringArrayList(key);
-            String[] rs = new String[mResult.size()];
-            mResult.toArray(rs);
-            tv2.setText(rs[0]);
-            result[count] = rs[0];
-            tv_result.setText(count+":"+result[count]);
+            // 말을 하면 ArrayList에 단어를 넣고 textView에 단어를 이어줍니다.
+            ArrayList<String> matches =
+                    results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+            String recText_org = matches.get(0); //인식된 음성정보
+            recText = recText_org.replace(" ", ""); //인식된 음성정보 공백제거
+
+            String lyrics_org = tv1.getText().toString(); //가사 정보
+            lyrics = lyrics_org.replace(" ", ""); //가사정보 공백제거
+            lyrics = lyrics.replace(".", ""); //가사정보 온점제거
+            lyrics = lyrics.replace("!",""); //가사정보 느낌표제거
+
+            SpannableStringBuilder sb = new SpannableStringBuilder(recText_org);
+
+            int length = (recText.length()>lyrics.length())?recText.length():lyrics.length();
+            for (int i = 0; i < length; i++) {
+                try {
+                    if ((recText.charAt(i)) == (lyrics.charAt(i))) {  //음성정보와 가사와 비교해서 가사 정확도 점수측정
+                        rightCount++;
+                    } else {
+                        wrong[wrong_num] = i;
+                        wrong_num++;
+                    }
+                } catch (Exception e) {
+                    break;
+                }
+            }
+
+            for(int j=0; j<wrong_num; j++) {
+                for(int i=0; i<recText_org.length(); i++) {
+                    try {
+                        if((recText_org.charAt(i)) == (recText.charAt(wrong[j]))) {
+                            ForegroundColorSpan span = new ForegroundColorSpan(Color.parseColor("#FFFA5252"));
+                            sb.setSpan(span, i, i+1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        }
+                    } catch (Exception e) {
+                        break;
+                    }
+                }
+
+            }
+
+            if(rightCount > recText.length()-3) {
+                tv2.setText(sb);
+                btn.setEnabled(true);
+
+            } else {
+                btn.setEnabled(false);
+                Toast.makeText(getApplicationContext(), "다시 말해주세요.", Toast.LENGTH_SHORT).show();
+                rightCount=0;
+                mRecognizer.startListening(i);
+            }
+
         }
 
+        @Override
+        public void onPartialResults(Bundle partialResults) {
+        }
+
+        @Override
+        public void onEvent(int eventType, Bundle params) {
+
+        }
     };
 
     public void createData() {
