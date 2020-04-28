@@ -24,13 +24,11 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-    Button btn;
+    Button btn, btn_2, btn_3;
     int PERMISSION;
     String[] example_k = new String[3];
     String[] example_e = new String[3];
-    int count, rightCount;
-    int wrong_num;
-
+    int count;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +61,36 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(intent);
                 }
             });
+
+        btn_2 = findViewById(R.id.btn_2);
+        btn_2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent intent = new Intent(getApplicationContext(), SpeechActivity.class);
+                for (int i=0; i<2; i++) {
+                    intent.putExtra("count", 2);
+                    intent.putExtra("kor_"+i, example_k[i]);
+                    intent.putExtra("eng_"+i, example_e[i]);
+                }
+                startActivity(intent);
+            }
+        });
+
+        btn_3 = findViewById(R.id.btn_3);
+        btn_3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent intent = new Intent(getApplicationContext(), SpeechActivity.class);
+                for (int i=0; i<3; i++) {
+                    intent.putExtra("count", 3);
+                    intent.putExtra("kor_"+i, example_k[i]);
+                    intent.putExtra("eng_"+i, example_e[i]);
+                }
+                startActivity(intent);
+            }
+        });
 
     }
 

@@ -20,7 +20,7 @@
         </activity>
         <activity android:name=".CustomDialog"
             android:theme="@style/dialogTheme" android:screenOrientation="portrait"></activity>
-
+        <activity android:name=".SpeechActivity"/>
     </application>
 
 
