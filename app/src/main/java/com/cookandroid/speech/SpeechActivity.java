@@ -23,7 +23,7 @@ public class SpeechActivity extends AppCompatActivity {
 
     String[] kor = new String[3];
     String[] eng = new String[3];
-    int count;
+    int count; // case 개수 (intent로 받아옴)
     Intent i;
     SpeechRecognizer mRecognizer;
     String recText;
@@ -54,6 +54,7 @@ public class SpeechActivity extends AppCompatActivity {
                 textview_kor[i].setText(kor[i]);
                 textview_eng[i].setText(eng[i]);
             }
+            // 텍스트뷰 숨기기
             textview_kor[2].setVisibility(View.GONE);
             textview_eng[2].setVisibility(View.GONE);
         } else {
@@ -150,6 +151,7 @@ public class SpeechActivity extends AppCompatActivity {
             String recText_org = matches.get(0); //인식된 음성정보
             recText = recText_org.replace(" ", ""); //인식된 음성정보 공백제거
 
+            // 배열로 선언
             String[] lyrics_org = new String[count];
             String[] lyrics = new String[count];
             int[] rightCount = new int[count];
@@ -158,6 +160,7 @@ public class SpeechActivity extends AppCompatActivity {
 
             SpannableStringBuilder sb = new SpannableStringBuilder(recText_org);
 
+            // 문장 개수 따라 검사
             for(int i=0; i< count; i++) {
                 rightCount[i] = 0;
 
@@ -180,14 +183,16 @@ public class SpeechActivity extends AppCompatActivity {
                     }
                 }
 
+                // 맞은 개수가 가장 많은 문장 찾기
                 if(rightCount[i] > max) {
                     max = rightCount[i];
+                    // 그 문장의 번호를 저장
                     max_num = i;
                 }
 
             }
 
-
+            // 해당 문장과 발음한 문장 비교
                 int length = (recText.length()>lyrics[max_num].length())?recText.length():lyrics[max_num].length();
                 for (int j = 0; j < length; j++) {
                     try {
@@ -218,6 +223,7 @@ public class SpeechActivity extends AppCompatActivity {
 
                 }
 
+                // 해당되는 문장 색 바꾸기
             textview_kor[max_num].setTextColor(Color.parseColor("#FF52B4FA"));
             textview_eng[max_num].setTextColor(Color.parseColor("#FF52B4FA"));
             tv_wrong.setText(sb);
