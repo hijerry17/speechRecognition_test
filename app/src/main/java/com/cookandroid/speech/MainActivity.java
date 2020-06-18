@@ -24,7 +24,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-    Button btn, btn_2, btn_3;
+    Button btn, btn_2, btn_3, btn_4;
     int PERMISSION;
     String[] example_k = new String[3];
     String[] example_e = new String[3];
@@ -92,12 +92,20 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        btn_4 = findViewById(R.id.btn_4);
+        btn_4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
     }
 
     public void createKorData() {
-        example_k[0] = "안녕하세요.";
-        example_k[1] = "오랜만입니다.";
-        example_k[2] = "배가 고프네요.";
+        example_k[0] = "아이스 아메리카노";
+        example_k[1] = "아 하 오 호";
+        example_k[2] = "하하 테스트 호호";
     }
 
     public void createEngData() {

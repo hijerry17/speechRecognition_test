@@ -157,17 +157,34 @@ public class SpeechActivity extends AppCompatActivity {
             int[] rightCount = new int[count];
             int max = 0;
             int max_num = 0;
+            String[] position = new String[recText_org.length()];
 
             SpannableStringBuilder sb = new SpannableStringBuilder(recText_org);
 
             // 문장 개수 따라 검사
             for(int i=0; i< count; i++) {
+                int num = 0;
+
                 rightCount[i] = 0;
 
                 lyrics_org[i] = kor[i]; //가사 정보
-                lyrics[i] = lyrics_org[i].replace(" ", ""); //가사정보 공백제거
-                lyrics[i] = lyrics[i].replace(".", ""); //가사정보 온점제거
-                lyrics[i] = lyrics[i].replace("!", ""); //가사정보 느낌표제거
+
+                String[] test = new String[recText_org.length()];
+
+
+                for (int j = 0; j < lyrics_org[i].length(); j++) {
+                    if((lyrics_org[i].charAt(j)) == ' ' || (lyrics_org[i].charAt(j)) == '.'  || (lyrics_org[i].charAt(j)) == '!' ) {
+                        lyrics[i] = lyrics_org[i].replace(" ", "/"); //가사정보 공백제거
+                        lyrics[i] = lyrics[i].replace(".", "/"); //가사정보 온점제거
+                        lyrics[i] = lyrics[i].replace("!", "/"); //가사정보 느낌표제거
+                        test[num] = String.valueOf(j);
+                        num++;
+                    }
+
+                    for (int k=num; k<recText_org.length(); k++) {
+                        test[k] = String.valueOf("");
+                    }
+                }
 
                 int length = (recText.length() > lyrics[i].length()) ? recText.length() : lyrics[i].length();
                 for (int j = 0; j < length; j++) {
@@ -188,9 +205,24 @@ public class SpeechActivity extends AppCompatActivity {
                     max = rightCount[i];
                     // 그 문장의 번호를 저장
                     max_num = i;
-                }
 
+                    position = test;
+                }
             }
+
+            for (int k=0; k<position.length; k++) {
+                for (int j = 0; j<recText.length(); j++) {
+                    if(position[k].equals("")) {
+                        continue;
+                    } else {
+                        if (position[k].equals(String.valueOf(j))) {
+                            recText = recText.substring(0,j) +"/"+ recText.substring(j);
+                        }
+                    }
+                }
+            }
+
+            System.out.println("문장 : "+recText);
 
             // 해당 문장과 발음한 문장 비교
                 int length = (recText.length()>lyrics[max_num].length())?recText.length():lyrics[max_num].length();
